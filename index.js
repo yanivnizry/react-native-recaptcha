@@ -9,6 +9,7 @@ const RECAPTCHA_SUB_STR_FRAME="https://www.google.com/recaptcha/api2/bframe";
 export const type = Object.freeze({"invisible": 1, "normal": 2});
 
 const getInvisibleRecaptchaContent = (siteKey, action, onReady) => {
+    console.log('siteKey, action, onReady', siteKey, action, onReady)
     const webForm = '<!DOCTYPE html><html><head> ' +
     '<style>  .text-xs-center { text-align: center; } .g-recaptcha { display: inline-block; } </style> ' +
     '<script src="https://www.google.com/recaptcha/api.js?render=' + siteKey + '"></script> ' +
@@ -16,7 +17,7 @@ const getInvisibleRecaptchaContent = (siteKey, action, onReady) => {
     'grecaptcha.ready(function() { ' +
         `(${String(onReady)})(); ` +
         'grecaptcha.execute(\'' + siteKey + '\', {action: \'' + action + '\'}).then( '+
-            'function (responseToken) { window.postMessage(responseToken);  } ' +
+            'function (responseToken) { window.ReactNativeWebView.postMessage(responseToken);  } ' +
         ' ); ' +
     '}); ' +
     '</script>' +
@@ -36,7 +37,7 @@ const getNormalRecaptchaContent = (config) => {
     '<script> '+
     'function onloadCallback() { '+
         'window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-cont", '+
-            '{size: "normal", callback: function(response) { window.postMessage(response); }}); '+
+            '{size: "normal", callback: function(response) { window.ReactNativeWebView.postMessage(response); }}); '+
         'window.recaptchaVerifier.render(); '+
         '} '+
     '</script>'+
@@ -120,6 +121,8 @@ export default class ReCaptcha extends Component {
             url
         } = this.props;
 
+        let form = getInvisibleRecaptchaContent(siteKey, action, onReady);
+
         return (
             <MessageWebView
                 ref={(ref) => { this.webview = ref ;}}
@@ -128,8 +131,7 @@ export default class ReCaptcha extends Component {
                 containerStyle={containerStyle}
                 onMessage={(message) => onExecute(message)}
                 source={{
-                    html: reCaptchaType == type.invisible ? getInvisibleRecaptchaContent(siteKey, action, onReady) :
-                                getNormalRecaptchaContent(config),
+                    html: getInvisibleRecaptchaContent(siteKey, action, onReady),
                     baseUrl: url
                 }}
                 onShouldStartLoadWithRequest={this.onShouldStartLoadWithRequest}
