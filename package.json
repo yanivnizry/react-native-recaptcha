@@ -24,7 +24,8 @@
   "license": "ISC",
   "dependencies": {
     "prop-types": "^15.6.1",
-    "merge": ">=1.2.1"
+    "merge": ">=1.2.1",
+    "react-native-webview": "^8.0.1"
   },
   "peerDependencies": {
     "react-native": "*"
